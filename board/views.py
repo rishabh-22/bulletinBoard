@@ -8,13 +8,13 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 
 from board.models import Board
-from board.permissions import CustomPermissionClass
 from board.serializers import BoardSerializer
+from board.permissions import BoardPermissionClass, ThreadPermissionClass, PostPermissionClass
 
 
 class BoardList(APIView):
 
-    permission_classes = [CustomPermissionClass]
+    permission_classes = [BoardPermissionClass]
 
     def get(self, request):
         try:
@@ -37,11 +37,11 @@ class BoardList(APIView):
 
 class BoardDetail(APIView):
 
-    permission_classes = [CustomPermissionClass]
+    permission_classes = [BoardPermissionClass]
 
     def get(self, request, pk):
         try:
-            response = Board.objects.get(id=pk)
+            response = Board.objects.get(id=pk)  # todo: change and try to return all the threads related to this board
             return Response(response, status=status.HTTP_200_OK)
         except Board.DoesNotExist:
             return Response({'message': 'no board with such id exists.'}, status=status.HTTP_404_NOT_FOUND)
@@ -65,32 +65,37 @@ class BoardDetail(APIView):
         except Board.DoesNotExist:
             return Response({'message': 'no board with such id exists.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            # logging.log(e)
+            logging.error(e)
             return Response({'message': 'some error occurred, please try again later.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-class ThreadList(APIView):
+class ThreadDetail(APIView):
+    """
+    minimum one pk is required, you can't see all threads and related posts. hence pk is mandatory, no need to create a
+     thread, only refer a thread, thread creation will be automatic based on post creation without a thread id
 
-    authentication_classes = []
-    permission_classes = []
+    # todo: see all the posts related to a thread
+    """
+    permission_classes = [ThreadPermissionClass]
 
-    def post(self, request):
-        """
-        this function is used for returning an auth token to a valid user.
-        :param request:
-        :return:
-        """
-        try:
-            user = User.objects.get(username=request.data['username'])
-            if not user.check_password(request.data['password']):
-                raise Exception
-            token, created = Token.objects.get_or_create(user=user)
-            response = dict(message='login successful.', token=token.key)
-            return Response(response, status=status.HTTP_200_OK)
-        except Exception as e:
-            logging.debug(e)
-            return Response({
-                'error': 'provided data is incorrect.'
-            }, status=status.HTTP_400_BAD_REQUEST)
 
+class PostList(APIView):
+    """
+    create new post
+    """
+    permission_classes = [PostPermissionClass]
+
+
+class PostDetail(APIView):
+    """
+    view, edit, delete the post based on post id
+    """
+    permission_classes = [PostPermissionClass]
+
+
+class Moderator(APIView):
+    """
+    handle moderator related stuff, sending and accepting/rejecting moderator request.
+    """
+    pass
