@@ -18,6 +18,11 @@ class BoardList(APIView):
     permission_classes = [BoardPermissionClass]
 
     def get(self, request):
+        """
+        returns all the existing boards
+        :param request:
+        :return:
+        """
         try:
             boards = Board.objects.all()
             response = [x.__dict__ for x in boards]
@@ -27,6 +32,11 @@ class BoardList(APIView):
             return Response({'message': 'no board exists.'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
+        """
+        add a new board
+        :param request:
+        :return:
+        """
         serializer = BoardSerializer(data=request.data)
         if serializer.is_valid():
             uid = uuid.uuid4().hex
@@ -43,6 +53,12 @@ class BoardDetail(APIView):
     permission_classes = [BoardPermissionClass]
 
     def get(self, request, pk):
+        """
+        returns all the threads related to a particular board.
+        :param request:
+        :param pk:
+        :return:
+        """
         try:
             thread = Thread.objects.get(board__id=pk)  # returns all the threads related to this board
             response = thread.__dict__
@@ -54,6 +70,12 @@ class BoardDetail(APIView):
             return Response({'message': 'no threads for this board exist.'}, status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, pk):
+        """
+        edit an existing board
+        :param request:
+        :param pk:
+        :return:
+        """
         try:
             board = Board.objects.get(id=pk)
             serializer = BoardSerializer(board, data=request.data)
@@ -68,6 +90,12 @@ class BoardDetail(APIView):
             return Response({'message': 'no board with such id exists.'}, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk):
+        """
+        delete an existing board
+        :param request:
+        :param pk:
+        :return:
+        """
         try:
             board = Board.objects.get(id=pk)
             board.delete()
@@ -89,6 +117,11 @@ class ThreadDetail(APIView):
     permission_classes = [ThreadPermissionClass]
 
     def get(self, request):
+        """
+        returns the posts related to this thread
+        :param request:
+        :return:
+        """
         try:
             thread_id = request.data.get('thread_id')
             if thread_id is not None:
@@ -104,6 +137,11 @@ class ThreadDetail(APIView):
             return Response({'message': 'no posts found for this thread id'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
+        """
+        adds new thread
+        :param request:
+        :return:
+        """
         try:
             board_id = request.data.get('board_id')
             if board_id is None:
@@ -122,6 +160,11 @@ class ThreadDetail(APIView):
             return Response({'message': 'no board with this id exists.'}, status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request):
+        """
+        edits an existing thread
+        :param request:
+        :return:
+        """
         try:
             thread_id = request.data.get('thread_id')
             thread_text = request.data.get('text')
@@ -136,6 +179,11 @@ class ThreadDetail(APIView):
             return Response({'message': 'no thread with such id exists.'}, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request):
+        """
+        deletes an existing thread
+        :param request:
+        :return:
+        """
         try:
             thread_id = request.data.get('thread_id')
             if thread_id is not None:

@@ -13,13 +13,13 @@ class BoardPermissionClass(BasePermission):
                 return True
 
         elif request.method == 'PUT' or request.method == 'PATCH':
-            if request.user:
+            if not request.user.is_anonymous:
                 moderator = Moderator.objects.filter(moderator=request.user, board__id=view.kwargs.get('pk', 0),
                                                      active=True)
                 return True if moderator else False
 
         elif request.method == 'DELETE':
-            if request.user:
+            if not request.user.is_anonymous:
                 try:
                     board = Board.objects.get(id=view.kwargs.get('pk', 0))
                     if board.owner == request.user:
@@ -40,21 +40,21 @@ class ThreadPermissionClass(BasePermission):
                 return True
 
         elif request.method == 'PUT' or request.method == 'PATCH':
-            if request.user:
+            if not request.user.is_anonymous:
                 try:
-                    thread = Thread.objects.get(id=view.kwargs.get('pk', 0))
+                    thread = Thread.objects.get(id=view.request.data.get('thread_id'))
                     moderator = Moderator.objects.filter(moderator=request.user, board__id=thread.board_id, active=True)
                     return True if moderator else False
                 except Thread.DoesNotExist:
                     return True
 
         elif request.method == 'DELETE':
-            if request.user:
+            if not request.user.is_anonymous:
                 try:
-                    thread = Thread.objects.get(id=view.kwargs.get('pk', 0))
+                    thread = Thread.objects.get(id=view.request.data.get('thread_id'))
                     if thread.owner == request.user:
                         return True
-                except Board.DoesNotExist:
+                except Thread.DoesNotExist:
                     return True
 
         return False
@@ -70,7 +70,7 @@ class PostPermissionClass(BasePermission):
                 return True
 
         elif request.method == 'PUT' or request.method == 'PATCH':
-            if request.user:
+            if not request.user.is_anonymous:
                 try:
                     post = Post.objects.get(id=view.kwargs.get('pk', 0))
                     moderator = Moderator.objects.filter(moderator=request.user, board__id=post.thread.board_id,
@@ -80,10 +80,10 @@ class PostPermissionClass(BasePermission):
                     return True
 
         elif request.method == 'DELETE':
-            if request.user:
+            if not request.user.is_anonymous:
                 try:
                     post = Post.objects.get(id=view.kwargs.get('pk', 0))
-                    if post.owner == request.user:
+                    if post.author == request.user:
                         return True
                 except Board.DoesNotExist:
                     return True
