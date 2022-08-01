@@ -27,3 +27,28 @@ These components are connected in a way that
 - a thread can contain multiple posts by different people.
 - a post can be made by any authorised person.
 - an unauthorised person has read access but can not make any thread/post or board.
+
+
+## APIs
+
+#### Admin
+
+- admin panel: `admin/`
+
+
+#### User Management
+
+- register: `register/`
+- login: `login/`
+- avatar: `avatar/`
+
+#### Board Management
+
+- board management: `board/` and `board/<id>`
+- moderator management: `moderator/`
+- thread management: `thread/`
+- post management: `post/` and `post/<id>`
+- board groups: `bgroup/`
+
+
+Each of the above-mentioned APIs have different methods which are used to edit, view, add or delete the boards, threads and posts respectively.
