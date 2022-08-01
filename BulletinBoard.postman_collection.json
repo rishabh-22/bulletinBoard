@@ -1,0 +1,594 @@
+{
+	"info": {
+		"_postman_id": "b7589d3b-87f1-46a9-935a-6d1587950092",
+		"name": "BulletinBoard",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6847251"
+	},
+	"item": [
+		{
+			"name": "add-board",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"topic\": \"board1\",\n    \"context\": \"this is test board 1.\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/board/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"board",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-boards",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/board/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"board",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add-thread",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"board_id\": \"4af5b324e74f4aa98c7ce61076c1c75a\",\n    \"text\": \"this is thread 1 for testing.\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/thread/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"thread",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-board-threads",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/board/4af5b324e74f4aa98c7ce61076c1c75a",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"board",
+						"4af5b324e74f4aa98c7ce61076c1c75a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-thread-posts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"thread_id\": \"39567fbe81ae41c6a0d4e30eef09f06d\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/thread/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"thread",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add-post",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"post1\",\n    \"content\": \"this is post 1 for testing.\",\n    \"thread_id\": \"39567fbe81ae41c6a0d4e30eef09f06d\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/post/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"post",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-post",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"post1\",\n    \"content\": \"this is post 1 for testing.\",\n    \"thread_id\": \"39567fbe81ae41c6a0d4e30eef09f06d\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/post/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"post",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-moderator-requests",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/moderator/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"moderator",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add-moderator-request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"rishabh\",\n    \"board_id\": \"4af5b324e74f4aa98c7ce61076c1c75a\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/moderator/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"moderator",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "accept-moderator-request",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token c33f6be79de61372a47d91ce115959b5009a5dc0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request_id",
+							"value": "4",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/moderator/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"moderator",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete-post",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/post/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"post",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit-post",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"post1\",\n    \"content\": \"this is post 1 for testing.\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/post/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"post",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit-thread",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"thread_id\": \"39567fbe81ae41c6a0d4e30eef09f06d\",\n    \"text\": \"this is thread 1.\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/thread/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"thread",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete-thread",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token 0f9617bd9e930abddad58f5bc8b69d92c82b69ed",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"thread_id\": \"39567fbe81ae41c6a0d4e30eef09f06d\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/thread/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"thread",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit-board",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token c33f6be79de61372a47d91ce115959b5009a5dc0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"topic\": \"board2\",\n    \"context\": \"this is test board.\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/board/54700e21a9e94ec282e88b7e0c76f84e",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"board",
+						"54700e21a9e94ec282e88b7e0c76f84e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete-board",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token c33f6be79de61372a47d91ce115959b5009a5dc0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/board/54700e21a9e94ec282e88b7e0c76f84e",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"board",
+						"54700e21a9e94ec282e88b7e0c76f84e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "board-group",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token c33f6be79de61372a47d91ce115959b5009a5dc0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/bgroup/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"bgroup",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
