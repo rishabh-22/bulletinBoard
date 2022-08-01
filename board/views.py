@@ -19,7 +19,9 @@ class BoardList(APIView):
 
     def get(self, request):
         try:
-            response = Board.objects.all()
+            boards = Board.objects.all()
+            response = [x.__dict__ for x in boards]
+            [x.pop('_state') for x in response]
             return Response(response, status=status.HTTP_200_OK)
         except Board.DoesNotExist:
             return Response({'message': 'no board exists.'}, status=status.HTTP_404_NOT_FOUND)
@@ -42,10 +44,14 @@ class BoardDetail(APIView):
 
     def get(self, request, pk):
         try:
-            response = Thread.objects.get(board__id=pk)  # returns all the threads related to this board
+            thread = Thread.objects.get(board__id=pk)  # returns all the threads related to this board
+            response = thread.__dict__
+            response.pop('_state')
             return Response(response, status=status.HTTP_200_OK)
-        except (Board.DoesNotExist, Thread.DoesNotExist):
+        except Board.DoesNotExist:
             return Response({'message': 'no board with such id exists.'}, status=status.HTTP_404_NOT_FOUND)
+        except Thread.DoesNotExist:
+            return Response({'message': 'no threads for this board exist.'}, status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, pk):
         try:
@@ -78,8 +84,7 @@ class ThreadDetail(APIView):
     """
     minimum one pk is required, you can't see all threads and related posts. hence pk is mandatory, no need to create a
      thread, only refer a thread, thread creation will be automatic based on post creation without a thread id
-
-    # todo: see all the posts related to a thread
+    see all the posts related to a thread
     """
     permission_classes = [ThreadPermissionClass]
 
@@ -87,19 +92,26 @@ class ThreadDetail(APIView):
         try:
             thread_id = request.data.get('thread_id')
             if thread_id is not None:
-                posts = Post.objects.get(thread__id=thread_id)
-                return Response(posts, status=status.HTTP_200_OK)
+                posts = Post.objects.filter(thread__id=thread_id)
+                response = [x.__dict__ for x in posts]
+                [x.pop('_state') for x in response]
+                return Response(response, status=status.HTTP_200_OK)
             else:
                 return Response({'message': 'invalid thread id'}, status=status.HTTP_400_BAD_REQUEST)
-        except (Thread.DoesNotExist, Post.DoesNotExist):
-            return Response({'message': 'no thread with this id'}, status=status.HTTP_404_NOT_FOUND)
+        except Thread.DoesNotExist:
+            return Response({'message': 'no thread found with this id'}, status=status.HTTP_404_NOT_FOUND)
+        except Post.DoesNotExist:
+            return Response({'message': 'no posts found for this thread id'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         try:
+            board_id = request.data.get('board_id')
+            if board_id is None:
+                return Response({'message': 'invalid board id.'}, status=status.HTTP_400_BAD_REQUEST)
             serializer = ThreadSerializer(data=request.data)
             if serializer.is_valid():
                 uid = uuid.uuid4().hex
-                board = Board.objects.get(id=request.data.get('board_id'))
+                board = Board.objects.get(id=board_id)
                 thread = serializer.save(owner=request.user, board=board, id=uid)
                 response = dict(message=f'successfully created thread with id {uid}.')
                 return Response(response, status=status.HTTP_201_CREATED)
@@ -117,6 +129,7 @@ class ThreadDetail(APIView):
                 thread = Thread.objects.get(id=thread_id)
                 thread.text = thread_text
                 thread.save()
+                return Response({'message': 'thread text updated!'}, status=status.HTTP_200_OK)
             else:
                 return Response({'message': 'thread id or updated text is missing'}, status=status.HTTP_400_BAD_REQUEST)
         except Thread.DoesNotExist:
@@ -128,6 +141,7 @@ class ThreadDetail(APIView):
             if thread_id is not None:
                 thread = Thread.objects.get(id=thread_id)
                 thread.delete()
+                return Response({'message': 'thread deleted!'}, status=status.HTTP_200_OK)
             else:
                 return Response({'message': 'thread id is missing'}, status=status.HTTP_400_BAD_REQUEST)
         except Thread.DoesNotExist:
@@ -142,16 +156,21 @@ class PostList(APIView):
 
     def get(self, request):
         try:
-            response = Post.objects.all()  # todo: change this to return all posts of a thread/board
+            posts = Post.objects.all()  # can change this to return all posts of a thread/board
+            response = [x.__dict__ for x in posts]
+            [x.pop('_state') for x in response]
             return Response(response, status=status.HTTP_200_OK)
         except Board.DoesNotExist:
             return Response({'message': 'no post exists.'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         try:
+            thread_id = request.data.get('thread_id')
+            if thread_id is None:
+                return Response({'message': 'invalid thread id.'}, status=status.HTTP_400_BAD_REQUEST)
             serializer = PostSerializer(data=request.data)
             if serializer.is_valid():
-                thread = Thread.objects.get(id=request.data.get('thread_id'))
+                thread = Thread.objects.get(id=thread_id)
                 post = serializer.save(author=request.user, thread=thread)
                 response = dict(message=f'successfully created post.')
                 return Response(response, status=status.HTTP_201_CREATED)
@@ -174,7 +193,7 @@ class PostDetail(APIView):
             serializer = PostSerializer(post, data=request.data)
             if serializer.is_valid():
                 post = serializer.save(author=request.user)
-                response = dict(message=f'successfully modified post with.')
+                response = dict(message=f'successfully modified post.')
                 return Response(response, status=status.HTTP_200_OK)
             else:
                 response = serializer.errors
@@ -203,29 +222,44 @@ class ModeratorList(APIView):
 
     def get(self, request):
         try:
-            requests = Moderator.objects.get(moderator=request.user, active=False)
-            return Response(requests, status=status.HTTP_200_OK)
+            requests = Moderator.objects.filter(moderator=request.user, active=False)
+            response = [x.__dict__ for x in requests]
+            [x.pop('_state') for x in response]
+            return Response(response, status=status.HTTP_200_OK)
         except Moderator.DoesNotExist:
             return Response({'message': 'no requests found for your account'})
 
     def post(self, request):
         try:
-            serializer = ModeratorSerializer(request.data)
+            username = request.data.get('username')
+            board_id = request.data.get('board_id')
+            if username is None or board_id is None:
+                return Response({'message': 'please check the data you have sent. username and board_id is required.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+            serializer = ModeratorSerializer(data=request.data)
             if serializer.is_valid():
-                moderator = User.objects.get(username=request.data.get('username'))
-                board = Board.objects.get(id=request.data.get('board_id'))
+                moderator = User.objects.get(username=username)
+                board = Board.objects.get(id=board_id)
                 serializer.save(moderator=moderator, board=board)
                 return Response({'message': 'moderator request successfully created.'}, status=status.HTTP_201_CREATED)
+
+        except User.DoesNotExist:
+            return Response({'message': 'user with username not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Board.DoesNotExist:
+            return Response({'message': 'board with id not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             logging.error(e)
             return Response({'message': 'please check the data you have sent.'}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
         try:
-            moderator_request = Moderator.objects.get(id=request.data.get('request_id', 0))
+            request_id = request.data.get('request_id')
+            if request_id is None:
+                return Response({'message': 'invalid request id!'}, status=status.HTTP_400_BAD_REQUEST)
+            moderator_request = Moderator.objects.get(id=request_id)
             moderator_request.active = True
             moderator_request.save()
-
+            return Response({'message': 'request accepted!'}, status=status.HTTP_200_OK)
         except Moderator.DoesNotExist:
             return Response({'message': 'invalid request id!'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:

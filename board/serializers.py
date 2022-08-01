@@ -12,16 +12,16 @@ class BoardSerializer(serializers.ModelSerializer):
 class ModeratorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Moderator
-        fields = ['username', 'board_id']
+        fields = []  # todo: fix via logic
 
 
 class ThreadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Thread
-        fields = ['board_id', 'text']
+        fields = ['text']
 
 
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['thread_id', 'title', 'content']
+        fields = ['title', 'content']

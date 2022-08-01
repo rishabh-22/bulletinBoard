@@ -59,4 +59,4 @@ class Post(models.Model):
 @receiver(post_save, sender=Board)
 def create_board_moderator(sender, instance=None, created=False, **kwargs):
     if created:
-        Moderator.objects.create(board=instance, moderator=instance.owner)
+        Moderator.objects.create(board=instance, moderator=instance.owner, active=True)
