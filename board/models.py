@@ -18,9 +18,10 @@ class Board(models.Model):
 
 
 class Moderator(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.IntegerField(primary_key=True, auto_created=True)
     moderator = models.ForeignKey(User, on_delete=models.CASCADE)
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    active = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.board}-{self.moderator}'

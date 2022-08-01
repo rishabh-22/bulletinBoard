@@ -7,9 +7,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
-from board.models import Board
-from board.serializers import BoardSerializer
-from board.permissions import BoardPermissionClass, ThreadPermissionClass, PostPermissionClass
+from board.models import Board, Moderator
+from board.serializers import BoardSerializer, ModeratorSerializer
+from board.permissions import BoardPermissionClass, ThreadPermissionClass, PostPermissionClass, ModeratorPermissionClass
 
 
 class BoardList(APIView):
@@ -94,8 +94,39 @@ class PostDetail(APIView):
     permission_classes = [PostPermissionClass]
 
 
-class Moderator(APIView):
+class ModeratorList(APIView):
     """
     handle moderator related stuff, sending and accepting/rejecting moderator request.
     """
-    pass
+    permission_classes = [ModeratorPermissionClass]
+
+    def get(self, request):
+        try:
+            requests = Moderator.objects.get(moderator=request.user, active=False)
+            return Response(requests, status=status.HTTP_200_OK)
+        except Moderator.DoesNotExist:
+            return Response({'message': 'no requests found for your account'})
+
+    def post(self, request):
+        try:
+            serializer = ModeratorSerializer(request.data)
+            if serializer.is_valid():
+                moderator = User.objects.get(username=request.data.get('username'))
+                board = Board.objects.get(id=request.data.get('board_id'))
+                serializer.save(moderator=moderator, board=board)
+                return Response({'message': 'moderator request successfully created.'}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logging.error(e)
+            return Response({'message': 'please check the data you have sent.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        try:
+            moderator_request = Moderator.objects.get(id=request.data.get('request_id', 0))
+            moderator_request.active = True
+            moderator_request.save()
+
+        except Moderator.DoesNotExist:
+            return Response({'message': 'invalid request id!'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logging.error(e)
+            return Response({'message': 'invalid data!'}, status=status.HTTP_403_FORBIDDEN)
