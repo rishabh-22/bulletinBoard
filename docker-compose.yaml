@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  bulletin:
+    build:
+      dockerfile: /Dockerfile
+      context: .
+    volumes:
+      - ./:/bulletin
+    environment:
+      RDS_HOST:
+      RDS_DB: bulletin
+      RDS_USER:
+      RDS_PASS:
+    ports:
+      - "8000:8000"
