@@ -5,10 +5,9 @@ from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 
-from board.models import Board, Moderator
-from board.serializers import BoardSerializer, ModeratorSerializer
+from board.models import Board, Thread, Post, Moderator
+from board.serializers import BoardSerializer, ModeratorSerializer, PostSerializer, ThreadSerializer
 from board.permissions import BoardPermissionClass, ThreadPermissionClass, PostPermissionClass, ModeratorPermissionClass
 
 
@@ -21,7 +20,7 @@ class BoardList(APIView):
             response = Board.objects.all()
             return Response(response, status=status.HTTP_200_OK)
         except Board.DoesNotExist:
-            return Response({'message': 'no board with such id exists.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': 'no board exists.'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         serializer = BoardSerializer(data=request.data)
@@ -41,9 +40,9 @@ class BoardDetail(APIView):
 
     def get(self, request, pk):
         try:
-            response = Board.objects.get(id=pk)  # todo: change and try to return all the threads related to this board
+            response = Thread.objects.get(board__id=pk)  # returns all the threads related to this board
             return Response(response, status=status.HTTP_200_OK)
-        except Board.DoesNotExist:
+        except (Board.DoesNotExist, Thread.DoesNotExist):
             return Response({'message': 'no board with such id exists.'}, status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, pk):
@@ -79,12 +78,59 @@ class ThreadDetail(APIView):
     """
     permission_classes = [ThreadPermissionClass]
 
+    def get(self, request):
+        try:
+            thread_id = request.data.get('thread_id')
+            if thread_id is not None:
+                posts = Post.objects.get(thread__id=thread_id)
+                return Response(posts, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'invalid thread id'}, status=status.HTTP_400_BAD_REQUEST)
+        except (Thread.DoesNotExist, Post.DoesNotExist):
+            return Response({'message': 'no thread with this id'}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        try:
+            serializer = ThreadSerializer(data=request.data)
+            if serializer.is_valid():
+                uid = uuid.uuid4().hex
+                board = Board.objects.get(id=request.data.get('board_id'))
+                thread = serializer.save(owner=request.user, board=board, id=uid)
+                response = dict(message=f'successfully created thread with id {uid}.')
+                return Response(response, status=status.HTTP_201_CREATED)
+            else:
+                response = serializer.errors
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        except Board.DoesNotExist:
+            return Response({'message': 'no board with this id exists.'}, status=status.HTTP_404_NOT_FOUND)
+
 
 class PostList(APIView):
     """
     create new post
     """
     permission_classes = [PostPermissionClass]
+
+    def get(self, request):
+        try:
+            response = Post.objects.all()  # todo: change this to return all posts of a thread/board
+            return Response(response, status=status.HTTP_200_OK)
+        except Board.DoesNotExist:
+            return Response({'message': 'no post exists.'}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        try:
+            serializer = PostSerializer(data=request.data)
+            if serializer.is_valid():
+                thread = Thread.objects.get(id=request.data.get('thread_id'))
+                post = serializer.save(author=request.user, thread=thread)
+                response = dict(message=f'successfully created post.')
+                return Response(response, status=status.HTTP_201_CREATED)
+            else:
+                response = serializer.errors
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        except Thread.DoesNotExist:
+            return Response({'message': 'no thread with this id exists.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class PostDetail(APIView):

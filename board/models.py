@@ -31,7 +31,7 @@ class Moderator(models.Model):
 
 
 class Thread(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.CharField(primary_key=True, max_length=64)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
     text = models.CharField(max_length=255)
@@ -45,7 +45,7 @@ class Thread(models.Model):
 
 
 class Post(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.IntegerField(primary_key=True, auto_created=True)
     author = models.ForeignKey(User, unique=True, on_delete=models.CASCADE)
     thread = models.ForeignKey(Thread, unique=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
