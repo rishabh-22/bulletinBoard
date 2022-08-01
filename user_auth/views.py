@@ -2,12 +2,14 @@ import logging
 
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
 from user_auth.serializers import RegistrationSerializer
+from user_auth.utils import get_user_gravatar_image
 
 
 class Register(APIView):
@@ -56,3 +58,10 @@ class Login(APIView):
                 'error': 'provided data is incorrect.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
+
+class UserAvatar(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        image_url = get_user_gravatar_image(request.user.email)
+        return Response({'image_url': image_url}, status=status.HTTP_200_OK)

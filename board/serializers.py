@@ -6,7 +6,7 @@ from rest_framework import serializers
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
-        fields = ['name', 'context']
+        fields = ['topic', 'context']
 
 
 class ModeratorSerializer(serializers.ModelSerializer):

@@ -23,9 +23,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', auth_view.Register.as_view()),
     path('login/', auth_view.Login.as_view()),
+    path('avatar/', auth_view.UserAvatar.as_view()),
     path('board/', board_view.BoardList.as_view()),
     path('board/<str:pk>', board_view.BoardDetail.as_view()),
     path('moderator/', board_view.ModeratorList.as_view()),
     path('thread/', board_view.ThreadDetail.as_view()),
     path('post/', board_view.PostList.as_view()),
+    path('post/<int:pk>', board_view.PostDetail.as_view()),
+    path('bgroup/', board_view.BoardGroup.as_view()),
 ]

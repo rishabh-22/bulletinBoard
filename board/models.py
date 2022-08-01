@@ -9,12 +9,12 @@ from django.dispatch import receiver
 class Board(models.Model):
     id = models.CharField(primary_key=True, max_length=64)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
+    topic = models.CharField(max_length=50)
     context = models.CharField(max_length=255)
     created_at = models.DateTimeField(default=datetime.now)
 
     def __str__(self):
-        return self.name
+        return self.topic
 
 
 class Moderator(models.Model):
